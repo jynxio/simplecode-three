@@ -3,7 +3,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    entry: "./source/layers.js",
+    entry: "./source/point.js",
     plugins: [
         new HtmlWebpackPlugin({ title: "" }),
     ],
