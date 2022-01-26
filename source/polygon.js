@@ -6,6 +6,8 @@ import * as three from "three";
 
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
+import { triangulate } from "./library/earcut.js";
+
 /* ------------------------------------------------------------------------------------------------------ */
 /* Renderer */
 const renderer = new three.WebGLRenderer( { antialias: window.devicePixelRatio < 2 } );
@@ -41,33 +43,36 @@ window.addEventListener( "resize", _ => {
 } );
 
 /* ------------------------------------------------------------------------------------------------------ */
-/* 创建Points实例 */
+/* 创建Mesh实例 */
 const g = new three.BufferGeometry();
-const m = new three.PointsMaterial( { size: 10, sizeAttenuation: false } );
-const p = new three.Points( g, m );
+const m = new three.MeshBasicMaterial();
+const p = new three.Mesh( g, m );
 
 scene.add( p );
 
 /* 设置position属性 */
 const position_array = new Float32Array( [
-    - 1, 0, - 3, // x, y, z
-      0, 0, - 3, // x, y, z
-      1, 0, - 3, // x, y, z
+    - 1,   1, - 3, // 左上角
+      1,   1, - 3, // 右上角
+      1, - 1, - 3, // 右下角
+    - 1, - 1, - 3, // 左下角
 ] );
 const position_attribute = new three.BufferAttribute( position_array, 3 );
 
 g.setAttribute( "position", position_attribute );
 
-/* 设置顶点着色 */
-const color_array = new Float32Array( [
-    0xff, 0x00, 0xff, // r, g, b
-    0x00, 0xff, 0xff, // r, g, b
-    0xff, 0xff, 0x00, // r, g, b
-] );
-const color_attribute = new three.BufferAttribute( color_array, 3 );
+/* 设置index属性 */
+const index_array = new Uint16Array(
+    triangulate( position_array, 3 ) // [1, 0, 3, 3, 2, 1]
+);
+const index_attribute = new three.BufferAttribute( index_array, 1 );
 
-g.setAttribute( "color", color_attribute );
-m.vertexColors = true; // 激活顶点着色
+g.setIndex( index_attribute );
+g.index.needsUpdate = true;
+
+/* 更新包围盒属性 */
+g.computeBoundingSphere(); // 更新包围盒属性，避免被「视锥体剔除」误杀
+g.computeBoundingBox();    // 更新包围盒属性，避免被「视锥体剔除」误杀
 
 /* ------------------------------------------------------------------------------------------------------ */
 /* Render */
