@@ -58,6 +58,18 @@ scene.add( mesh );
 /*  */
 const composer = new EffectComposer( renderer );
 const pass_render = new RenderPass( scene, camera );
+const pass_bloom = new UnrealBloomPass( new three.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+
+pass_bloom.renderToScreen = true; // 最终过程是否被渲染到屏幕
+pass_bloom.threshold = 0;         // 透明度超过这个数值的材质才会被泛光处理
+pass_bloom.strength = 1;          // 强度
+pass_bloom.radius = 0;            // 半径
+
+composer.setSize( window.innerWidth, window.innerHeight );
+composer.addPass( pass_render );
+composer.addPass( pass_bloom );
+
+// TODO
 
 /* 移动相机 */
 camera.position.z = 3;
