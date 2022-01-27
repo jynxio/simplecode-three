@@ -12,6 +12,8 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 
+import GUI from "lil-gui";
+
 /* ------------------------------------------------------------------------------------------------------ */
 /* Renderer */
 const renderer = new three.WebGLRenderer( { antialias: window.devicePixelRatio < 2 } );
@@ -50,26 +52,38 @@ window.addEventListener( "resize", _ => {
 /* Box */
 const mesh = new three.Mesh(
     new three.BoxGeometry(),
-    new three.MeshNormalMaterial(),
+    new three.MeshBasicMaterial( { color: 0xff0000 } ),
 );
 
 scene.add( mesh );
 
-/*  */
+/* 泛光 */
 const composer = new EffectComposer( renderer );
 const pass_render = new RenderPass( scene, camera );
 const pass_bloom = new UnrealBloomPass( new three.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 
 pass_bloom.renderToScreen = true; // 最终过程是否被渲染到屏幕
-pass_bloom.threshold = 0;         // 透明度超过这个数值的材质才会被泛光处理
+pass_bloom.threshold = 0;         // ?
 pass_bloom.strength = 1;          // 强度
 pass_bloom.radius = 0;            // 半径
 
-composer.setSize( window.innerWidth, window.innerHeight );
-composer.addPass( pass_render );
-composer.addPass( pass_bloom );
+composer.setSize( window.innerWidth, window.innerHeight ); //
+composer.addPass( pass_render );                           // 将该后期处理环节添加至过程链
+composer.addPass( pass_bloom );                            // 将该后期处理环节添加至过程链
 
-// TODO
+window.addEventListener( "resize", _ => {
+
+    composer.setSize( window.innerWidth, window.innerHeight );
+
+} );
+
+/* 调试 */
+const gui = new GUI();
+
+gui.add( pass_bloom, "renderToScreen" );
+gui.add( pass_bloom, "threshold" ).min( 0 ).max( 1 ).step( 0.001 );
+gui.add( pass_bloom, "strength" ).min( 0 ).max( 10 ).step( 0.01 );
+gui.add( pass_bloom, "radius" ).min( 0 ).max( 10 ).step( 0.01 );
 
 /* 移动相机 */
 camera.position.z = 3;
@@ -80,6 +94,6 @@ renderer.setAnimationLoop( function loop() {
 
     controls.update();
 
-    renderer.render( scene, camera );
+    composer.render();  // 按顺序执行所有启用的后期处理环节, 来产生最终的帧
 
 } );
