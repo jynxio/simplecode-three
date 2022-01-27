@@ -3,7 +3,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    entry: "./source/polygon.js",
+    entry: "./source/textureGif.js",
     plugins: [
         new HtmlWebpackPlugin({ title: "" }),
     ],
