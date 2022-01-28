@@ -55,6 +55,8 @@ window.addEventListener( "resize", _ => {
  *
  * Layers实例的mask属性记录了当前实例所处的图层编号，Layers的set方法正是mask属性的setter。set方法的
  * 入参是0、1、...、31, mask的值是2^0、2^1、...、2^31
+ *
+ * Layers实例可以同时位于多个图层。
  */
 const mesh_r = new three.Mesh(
     new three.BoxGeometry(),

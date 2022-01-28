@@ -3,7 +3,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    entry: "./source/postprocessingFloodlightGlobal.js",
+    entry: "./source/postprocessingFloodlightLocal2.js",
     plugins: [
         new HtmlWebpackPlugin({ title: "" }),
     ],
