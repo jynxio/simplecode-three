@@ -77,6 +77,10 @@ window.addEventListener( "resize", _ => {
 
 } );
 
+/* 色调映射和曝光 */
+renderer.toneMapping = three.NoToneMapping;
+renderer.toneMappingExposure = 1;
+
 /* 调试 */
 const gui = new GUI();
 
@@ -84,6 +88,14 @@ gui.add( pass_bloom, "renderToScreen" );
 gui.add( pass_bloom, "threshold" ).min( 0 ).max( 1 ).step( 0.001 );
 gui.add( pass_bloom, "strength" ).min( 0 ).max( 10 ).step( 0.01 );
 gui.add( pass_bloom, "radius" ).min( 0 ).max( 10 ).step( 0.01 );
+gui.add( renderer, "toneMappingExposure" ).min( 0 ).max( 10 ).step( 0.01 ).name( "exposure" );
+gui.add( renderer, "toneMapping", {
+    no: three.NoToneMapping,
+    linear: three.LinearToneMapping,
+    reinhard: three.ReinhardToneMapping,
+    cineon: three.CineonToneMapping,
+    acesfilmic: three.ACESFilmicToneMapping,
+} ).onFinishChange( _ => renderer.toneMapping = + renderer.toneMapping );
 
 /* 移动相机 */
 camera.position.z = 3;
