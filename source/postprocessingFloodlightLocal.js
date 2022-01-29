@@ -14,6 +14,8 @@ import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 
+import GUI from "lil-gui";
+
 /* ------------------------------------------------------------------------------------------------------ */
 /* Renderer */
 const renderer = new three.WebGLRenderer( { antialias: window.devicePixelRatio < 2 } );
@@ -57,31 +59,29 @@ window.addEventListener( "resize", _ => {
  */
 
 /**
- * 泛光渲染函数，这个函数封装了处理的细节，如果你想要实现全局或局部泛光，就必须在beforFloodlightRendering和
- * beforNormalRendering中手动进行处理，另外该函数会接管renderer的帧循环函数，请小心其他的帧循环函数的效果覆盖了
- * 该帧循环函数的效果。
- * @param {Object}   options                           - 配置。
- * @param {Object}   options.renderer                  - WebGLRenderer实例。
- * @param {Object}   options.scene                     - Scene实例。
- * @param {Object}   options.camera                    - Camera实例。
- * @param {Function} options.beforFloodlightRendering  - 该函数的执行时机是泛光渲染之前。
- * @param {Function} options.beforNormalRendering      - 该函数的执行时机是泛光渲染之后，常规渲染之前。
- * @param {number}   [options.threshold = 0]           - ?
- * @param {number}   [options.strength = 1]            - ?
- * @param {number}   [options.radius = 0]              - ?
- * NOTICE：scene的background和renderer的autoColor也是需要处理的，函数内并没有处理。
- * NOTICE：函数中默认camera原来的图层是第0号，并使用第13号图层来作为泛光的处理层，你需要小心。
+ * 泛光渲染函数。
+ * @param   {Object}   options                          - 配置。
+ * @param   {Object}   options.renderer                 - WebGLRenderer实例。
+ * @param   {Object}   options.scene                    - Scene实例。
+ * @param   {Object}   options.camera                   - Camera实例。
+ * @param   {number}   options.threshold                - ?
+ * @param   {number}   options.strength                 - ?
+ * @param   {number}   options.radius                   - ?
+ * @returns {Object}                                    - 该返回值具有很多方法，详见函数内部。
  */
-function floodlightRender( {
+function FloodlightRenderer( {
     renderer,
     scene,
     camera,
-    beforNormalRendering,
-    beforFloodlightRendering,
     threshold = 0,
     strength = 1,
     radius = 0,
 } ) {
+
+    /*  */
+    this.threshold = threshold;
+    this.strength = strength
+    this.radius = radius;
 
     /*  */
     const size = renderer.getSize( new three.Vector2() ).toArray();
@@ -91,9 +91,9 @@ function floodlightRender( {
     const pass_render = new RenderPass( scene, camera );                                             // 后期处理（基本）
     const pass_bloom = new UnrealBloomPass( new three.Vector2().fromArray( size ), 1.5, 0.4, 0.85 ); // 后期处理（泛光
 
-    pass_bloom.threshold = threshold;
-    pass_bloom.strength = strength;
-    pass_bloom.radius = radius;
+    pass_bloom.threshold = this.threshold;
+    pass_bloom.strength = this.strength;
+    pass_bloom.radius = this.radius;
 
     composer_bloom.setSize( ...size );
     composer_bloom.addPass( pass_render );
@@ -125,7 +125,7 @@ function floodlightRender( {
     composer_final.setSize( ...size );
 
     /*  */
-    window.addEventListener( "resize", _ => { // 请确保该函数的执行时机在renderer的size更新之后
+    window.addEventListener( "resize", _ => { // NOTICE：请确保该函数的执行时机在renderer的size更新之后
 
         const size = renderer.getSize( new three.Vector2() ).toArray();
 
@@ -135,21 +135,65 @@ function floodlightRender( {
     } );
 
     /*  */
-    renderer.setAnimationLoop( function loop() {
+    this.getThreshold = function() {
 
-        beforFloodlightRendering && beforFloodlightRendering();
+        return this.threshold;
 
-        composer_bloom.render();
+    };
+    this.setThreshold = function( v ) {
 
-        beforNormalRendering && beforNormalRendering();
+        this.threshold = v;
 
-        composer_final.render();
+        pass_bloom.threshold = this.threshold;
 
-    } );
+    };
+
+    /*  */
+    this.getStrength = function() {
+
+        return this.strength;
+
+    };
+    this.setStrength = function( v ) {
+
+        this.strength = v
+
+        pass_bloom.strength = this.strength;
+
+
+    };
+
+    /*  */
+    this.getRadius = function() {
+
+        return this.radius;
+
+    };
+    this.setRadius = function( v ) {
+
+        this.radius = v;
+
+        pass_bloom.radius = this.radius;
+
+    };
+
+    /*  */
+    this.getFloodlightRender = function() {
+
+        return function render() { composer_bloom.render() };
+
+    };
+
+    /*  */
+    this.getFinalRender = function() {
+
+        return function render() { composer_final.render() };
+
+    };
 
 }
 
-/* Mesh */
+/* 待泛光渲染的mesh */
 const geometry = new three.BoxGeometry();
 const material = new three.MeshBasicMaterial();
 const mesh_floodlight = new three.Mesh( geometry, material );
@@ -162,23 +206,26 @@ scene.add( mesh_floodlight, mesh_no_floodlight );
 
 /* 雾 */
 scene.fog = new three.FogExp2( 0x262837, 0.05 );
-scene.background = new three.Color( 0x262837 );
+
+/* 背景色 */
+scene.background = new three.Color( 0x262837 ); // 如果使用了renderer的clearColor，则也需要如此处理。
 
 /* 泛光渲染 */
 const options = {
     renderer,
     scene,
     camera,
-    beforFloodlightRendering,
-    beforNormalRendering,
     threshold: 0,
     strength: 1,
     radius: 0,
 };
 
-function beforFloodlightRendering() {
+const floodlight_renderer = new FloodlightRenderer( options );
+const floodlight_render = floodlight_renderer.getFloodlightRender();
+const final_render = floodlight_renderer.getFinalRender();
 
-    /*  */
+renderer.setAnimationLoop( function loop() {
+
     controls.update();
 
     /*  */
@@ -186,24 +233,27 @@ function beforFloodlightRendering() {
 
     mesh_floodlight.layers.set( 1 );
 
-    /*  */
     scene.background.set( 0x000000 );
 
-}
-
-function beforNormalRendering() {
+    floodlight_render();
 
     /*  */
     camera.layers.set( 0 );
 
     mesh_floodlight.layers.set( 0 );
 
-    /*  */
     scene.background.set( 0x262837 );
 
-}
+    final_render();
 
-floodlightRender( options );
+} );
+
+/* 调试 */
+const gui = new GUI();
+
+gui.add( options, "threshold" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => floodlight_renderer.setThreshold( v ) );
+gui.add( options, "strength" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => floodlight_renderer.setStrength( v ) );
+gui.add( options, "radius" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => floodlight_renderer.setRadius( v ) );
 
 /* 移动相机 */
 camera.position.z = 3;

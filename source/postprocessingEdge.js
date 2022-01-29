@@ -65,7 +65,7 @@ window.addEventListener( "resize", _ => {
  * @param   {Array}  options.targets          - 由Mesh实例组成的数组，这些Mesh的边缘会高亮处理。
  * @returns {Object}                          - 该返回值具有很多方法，详见函数内部。
  */
-function HighlightEdgeRender( {
+function HighlightEdgeRenderer( {
     renderer,
     scene,
     camera,
@@ -112,7 +112,7 @@ function HighlightEdgeRender( {
     composer.addPass( pass_outline ); // 将该后期处理环节添加至过程链
 
     /*  */
-    window.addEventListener( "resize", _ => {
+    window.addEventListener( "resize", _ => {  // NOTICE：请确保该函数的执行时机在renderer的size更新之后
 
         const size = renderer.getSize( new three.Vector2() ).toArray();
 
@@ -268,8 +268,8 @@ const options = {
     targets: [ mesh_highlight ],
 };
 
-const highlightEdgeRender = new HighlightEdgeRender( options );
-const render = highlightEdgeRender.getRender();
+const highlight_edge_render = new HighlightEdgeRenderer( options );
+const render = highlight_edge_render.getRender();
 
 renderer.setAnimationLoop( function loop() {
 
@@ -282,13 +282,13 @@ renderer.setAnimationLoop( function loop() {
 /* 调试 */
 const gui = new GUI();
 
-gui.addColor( options, "visibleEdgeColor" ).onChange( v => highlightEdgeRender.setVisibleEdgeColor( v ) );
-gui.addColor( options, "hiddenEdgeColor" ).onChange( v => highlightEdgeRender.setHiddenEdgeColor( v ) );
-gui.add( options, "edgeGlow" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => highlightEdgeRender.setEdgeGlow( v ) );
-gui.add( options, "edgeThickness" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => highlightEdgeRender.setEdgeThickness( v ) );
-gui.add( options, "edgeStrength" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => highlightEdgeRender.setEdgeStrength( v ) );
-gui.add( options, "downSampleRatio" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => highlightEdgeRender.setDownSampleRatio( v ) );
-gui.add( options, "pulsePeriod" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => highlightEdgeRender.setPulsePeriod( v ) );
+gui.addColor( options, "visibleEdgeColor" ).onChange( v => highlight_edge_render.setVisibleEdgeColor( v ) );
+gui.addColor( options, "hiddenEdgeColor" ).onChange( v => highlight_edge_render.setHiddenEdgeColor( v ) );
+gui.add( options, "edgeGlow" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => highlight_edge_render.setEdgeGlow( v ) );
+gui.add( options, "edgeThickness" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => highlight_edge_render.setEdgeThickness( v ) );
+gui.add( options, "edgeStrength" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => highlight_edge_render.setEdgeStrength( v ) );
+gui.add( options, "downSampleRatio" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => highlight_edge_render.setDownSampleRatio( v ) );
+gui.add( options, "pulsePeriod" ).min( 0 ).max( 10 ).step( 0.001 ).onChange( v => highlight_edge_render.setPulsePeriod( v ) );
 
 /* 移动相机 */
 camera.position.z = 3;
