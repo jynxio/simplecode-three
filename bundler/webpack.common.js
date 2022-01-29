@@ -3,7 +3,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    entry: "./source/postprocessingFloodlightLocal2.js",
+    entry: "./source/postprocessingEdge.js",
     plugins: [
         new HtmlWebpackPlugin({ title: "" }),
     ],

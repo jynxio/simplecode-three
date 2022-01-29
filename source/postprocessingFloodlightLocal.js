@@ -57,7 +57,7 @@ window.addEventListener( "resize", _ => {
  */
 
 /**
- * 泛光渲染函数，这个函数封装了泛光处理的细节，如果你想要实现全局或局部泛光，就必须在beforFloodlightRendering和
+ * 泛光渲染函数，这个函数封装了处理的细节，如果你想要实现全局或局部泛光，就必须在beforFloodlightRendering和
  * beforNormalRendering中手动进行处理，另外该函数会接管renderer的帧循环函数，请小心其他的帧循环函数的效果覆盖了
  * 该帧循环函数的效果。
  * @param {Object}   options                           - 配置。
