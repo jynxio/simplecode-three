@@ -3,7 +3,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    entry: "./source/utilWorldCoordinateToScreenCoordinate.js",
+    entry: "./source/sprite.js",
     plugins: [
         new HtmlWebpackPlugin({ title: "" }),
     ],
