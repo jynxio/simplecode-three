@@ -3,7 +3,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    entry: "./source/sprite.js",
+    entry: "./source/textureVideoTransparent.js",
     plugins: [
         new HtmlWebpackPlugin({ title: "" }),
     ],

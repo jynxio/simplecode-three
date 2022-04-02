@@ -9,7 +9,7 @@ module.exports = merge(common, {
         static: "./",                        // 设置资源的起寻地址。
         compress: true,                      // 激活gzip。
         server: "http",                      // 设置网络传输协议。
-        port: 8080,                          // 设置端口号。
-        open: true,                          // 激活浏览器自启动。
+        port: 8085,                          // 设置端口号。
+        open: false,                         // 激活浏览器自启动。
     },
 });
