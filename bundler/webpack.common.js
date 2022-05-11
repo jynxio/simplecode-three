@@ -3,7 +3,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    entry: "./source/textureVideoTransparent.js",
+    entry: "./source/modelMine.js",
     plugins: [
         new HtmlWebpackPlugin({ title: "" }),
     ],

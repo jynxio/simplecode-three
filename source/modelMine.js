@@ -71,7 +71,12 @@ const arrow_5 = createArrow5();
 arrow_5.position.set(2.4, 0, -8);
 scene.add(arrow_5);
 
+// exportGltf(dotarray);
 // exportGltf(arrow_1);
+// exportGltf(arrow_2);
+// exportGltf(arrow_3);
+// exportGltf(arrow_4);
+// exportGltf(arrow_5);
 
 /**
  * 导出模型（参见exporter-gltf.html）。
